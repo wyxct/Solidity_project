@@ -1,0 +1,8 @@
+// SPDX-License-Identifier: SEE LICENSE IN LICENSE
+pragma solidity ^0.8.28;
+
+interface IFunding {
+    event Funded(address indexed sender, uint256 amount, uint256 timestamp);
+
+    function fund() external payable;
+}
