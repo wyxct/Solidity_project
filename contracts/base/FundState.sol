@@ -9,8 +9,10 @@ contract FundState {
         Failure
     }
 
+    State public state;
+
     modifier onlyActive() {
-        require(State == State.Active, "Fund is not active");
+        require(state == State.Active, "Fund is not active");
         _;
     }
 }
