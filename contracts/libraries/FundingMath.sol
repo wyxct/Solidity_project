@@ -7,8 +7,8 @@ library FundingMath {
         return block.timestamp >= deadline;
     }
 
-    function isEnough(uint256 amount, uint256 balance) internal pure returns (bool) {
-        return amount <= balance;
+    function isEnough(uint256 amount, uint256 needAmount, uint256 balance) internal pure returns (bool) {
+        return amount <= needAmount - balance;
     }
 
     function isWithinLimit(uint256 amount, uint256 min, uint256 max) internal pure returns (bool) {

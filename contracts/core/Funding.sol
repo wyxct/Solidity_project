@@ -5,13 +5,23 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../base/FundState.sol";
 import "../interfaces/IFunding.sol";
+import "../libraries/AddressUtils.sol";
+import "../libraries/FundingMath.sol";
 
 contract Funding is UUPSUpgradeable, OwnableUpgradeable, IFunding, FundState {
 
+    using AddressUtils for address payable;
+    using FundingMath for uint256;
+
     uint256 private constant MIN_FUNDING_AMOUNT = 1 ether;
     uint256 private constant MAX_FUNDING_AMOUNT = 10 ether;
-    mapping(address -> uint256) private _funds;
-    
+    uint256 private constant distributeDecimal = 100;
+    uint256 private constant distributeAmount = 100 ether;
+    uint256 private balance;
+    mapping(address => uint256) private _funds;
+    address[] private distributeReceivers;
+    uint256[] private distributePercentages;
+
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -26,9 +36,37 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, IFunding, FundState {
 
     // 核心逻辑：用户打款
     function fund() public payable override onlyActive{
-        require(msg.value > 0, "No ETH sent");
+        require(msg.value.isWithinLimit(MIN_FUNDING_AMOUNT, MAX_FUNDING_AMOUNT), "Funding amount exceeds limit");
+        require(msg.value.isEnough(distributeAmount, balance), "Past fund enough balance");
+        _funds[msg.sender] += msg.value;
+        balance += msg.value;
+        if (balance == distributeAmount){
+            state = State.Success;
+        }
         emit Funded(msg.sender, msg.value, block.timestamp);
     }
+
+    function setDistributeList(address[] calldata _distributeAddress, uint256[] calldata _distributeAmount) public onlyOwner {
+        require(_distributeAddress.length == _distributeAmount.length, "distributeAddress length not equal distributeAmount length");
+        uint256 total;
+        for(uint256 i = 0; i < _distributeAddress.length; i++){
+            total += _distributeAmount[i];
+        }
+        require(total == 100, "Total must be 100%");
+        distributeReceivers = _distributeAddress;
+        distributePercentages = _distributeAmount;
+    }
+
+    function distribute() public onlyOwner {
+        uint256 totalAmount = balance;
+        for(uint256 i = 0; i < distributeReceivers.length; i++){
+            address payable dst = payable(distributeReceivers[i]);
+            balance -= totalAmount * distributePercentages[i] / distributeDecimal;
+            dst.safeTransferETH(totalAmount * distributePercentages[i] / distributeDecimal);
+        }
+    }
+
+
 
     // UUPS必须实现
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}

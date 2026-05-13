@@ -15,4 +15,21 @@ contract FundState {
         require(state == State.Active, "Fund is not active");
         _;
     }
+
+    modifier onlyPaused() {
+        require(state == State.Paused, "Fund is not paused");
+        _;
+    }
+
+    modifier onlySuccess() {
+        require(state == State.Success, "Fund is not successful");
+        _;
+    }
+
+    modifier onlyFailure() {
+        require(state == State.Failure, "Fund is not failed");
+        _;
+    }
+
+
 }
