@@ -5,7 +5,6 @@ contract FundAccess {
 
     uint256 private START_TIME;
     uint256 private constant DURATION = 1 minutes;
-    address owner;
 
     constructor() {
         START_TIME = block.timestamp;
