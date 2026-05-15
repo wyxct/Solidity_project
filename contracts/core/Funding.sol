@@ -33,6 +33,8 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
     function initialize() public initializer {
         __Ownable_init();
         __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
+        __FundAccess_init();
         state = State.Active;
     }
 
@@ -68,7 +70,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
         distributePercentages = _distributeAmount;
     }
 
-    function distribute() public onlyOwner onlyNotDuringFunding onlySuccess nonReentrant{
+    function distribute() public onlyOwner nonReentrant{
         uint256 totalAmount = balance;
         for(uint256 i = 0; i < distributeReceivers.length; i++){
             address payable dst = payable(distributeReceivers[i]);
