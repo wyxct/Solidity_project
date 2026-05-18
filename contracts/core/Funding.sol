@@ -39,7 +39,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
     }
 
     // 核心逻辑：用户打款
-    function fund() public payable override onlyActive onlyDuringFunding{
+    function fund() public payable override onlyActive{
         require(msg.value.isWithinLimit(MIN_FUNDING_AMOUNT, MAX_FUNDING_AMOUNT), "Funding amount exceeds limit");
         require(msg.value.isEnough(distributeAmount, balance), "Past fund enough balance");
         _funds[msg.sender] += msg.value;
@@ -50,7 +50,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
         emit Funded(msg.sender, msg.value, block.timestamp);
     }
 
-    function refund() public onlyDuringFunding nonReentrant{
+    function refund() public nonReentrant{
         uint256 amount = _funds[msg.sender];
         require(amount > 0, "No fund to refund");
         _funds[msg.sender] = 0;
@@ -71,6 +71,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function distribute() public onlyOwner nonReentrant{
+        require(balance > 0, "has no balance");
         uint256 totalAmount = balance;
         for(uint256 i = 0; i < distributeReceivers.length; i++){
             address payable dst = payable(distributeReceivers[i]);

@@ -2,9 +2,8 @@ const { ethers } = require("hardhat");
 
 async function main() {
     // ===================== 只需要改这里 =====================
-    const CONTRACT_ADDRESS = "0x59b670e9fA9D0A427751Af201D676719a970857b";
+    const CONTRACT_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
     const SEND_ETH = "1"; // 打款 1 ETH
-    const REFUND_ETH = "1";
     const DISTRIBUTEARR = ["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", "0x90F79bf6EB2c4f870365E785982E1f101E93b906"]
     const DISTRIBUTEAMOUNT = [50, 50]
     // ======================================================
@@ -31,6 +30,15 @@ async function main() {
 
     console.log("✅ refund() 调用成功！");
     console.log("交易哈希:", tx_refund.hash);
+
+    const tx_fund1 = await funding.fund({
+        value: ethers.parseEther(SEND_ETH),
+    });
+
+    await tx_fund1.wait();
+
+    console.log("✅ fund() 调用成功！");
+    console.log("交易哈希:", tx_fund1.hash);
 
     const tx_set = await funding.setDistributeList(DISTRIBUTEARR, DISTRIBUTEAMOUNT);
 
