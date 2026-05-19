@@ -1,41 +1,76 @@
 FundingMonitor 众筹监控系统 ⚠️当前仓库只有Solidity部分，Go部分的代码详见仓库：https://github.com/wyxct/FundingMonitor
 基于 Solidity + Hardhat 构建的去中心化众筹项目，支持资金筹集、退款、分账，并配套链上事件监控服务，可实时统计用户捐款排行榜。
+
 ✨ 项目亮点
 安全可靠：使用 UUPS 可升级模式，结合 ReentrancyGuard 防重入，避免资金风险
+
 状态可控：众筹过程分为 Active/Success 状态，防止分账后再退款
+
 资金保护：支持全额退款、按比例分账，所有操作都有数学溢出保护
+
 链上可追溯：关键操作（捐款 / 退款 / 分账）都触发事件，可通过监控服务写入数据库
+
 数据可视化：配套后端服务统计捐款总额，自动生成实时排行榜
+
 🛠️ 技术栈
 模块	技术 / 工具
+
 智能合约	Solidity 0.8.28, OpenZeppelin, Hardhat
+
 合约模式	UUPS 可升级，Ownable, ReentrancyGuard
+
 后端服务	Go + GORM + PostgreSQL
+
 链上交互	ethclient 轮询监听事件
+
 部署与测试	Hardhat, Mocha/Chai
+
 📂 项目结构
+
 plaintext
+
 .
+
 ├── contracts/           # 智能合约源码
+
 │   ├── base/            # 基础合约（权限、状态管理）
+
 │   │   ├── FundAccess.sol    # 权限控制基类
+
 │   │   └── FundState.sol     # 众筹状态管理
+
 │   ├── core/            # 核心业务合约
+
 │   │   └── Funding.sol       # 主众筹合约（核心逻辑）
+
 │   ├── interfaces/      # 合约接口定义
+
 │   │   └── IFunding.sol
+
 │   └── libraries/       # 工具库
+
 │       ├── AddressUtils.sol  # 地址/ETH转账工具
+
 │       └── FundingMath.sol   # 金额计算工具
+
 ├── scripts/             # 部署与交互脚本
+
 │   ├── deploy.js        # 合约部署脚本
+
 │   └── callfunding.js   # 合约调用/测试脚本
+
 ├── test/                # 合约单元测试
+
 │   ├── funding.js       # 众筹功能测试
+
 │   └── Lock.js          # Hardhat 示例测试
+
 ├── hardhat.config.js    # Hardhat 网络与编译配置
+
 └── package.json         # 项目依赖配置
+
 🚀 合约功能说明
+
 1. 资金筹集（fund()）
 用户可在 1 ETH ~ 10 ETH 区间内捐款
 捐款记录实时写入链上，触发 Funded 事件
