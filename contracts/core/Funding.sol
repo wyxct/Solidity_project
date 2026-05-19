@@ -39,7 +39,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
     }
 
     // 核心逻辑：用户打款
-    function fund() public payable override onlyActive{
+    function fund() public payable override onlyActive onlyDuringFunding{
         require(msg.value.isWithinLimit(MIN_FUNDING_AMOUNT, MAX_FUNDING_AMOUNT), "Funding amount exceeds limit");
         require(msg.value.isEnough(distributeAmount, balance), "Past fund enough balance");
         _funds[msg.sender] += msg.value;
@@ -50,7 +50,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
         emit Funded(msg.sender, msg.value, block.timestamp);
     }
 
-    function refund() public nonReentrant{
+    function refund() public nonReentrant onlyActive onlyDuringFunding{
         uint256 amount = _funds[msg.sender];
         require(amount > 0, "No fund to refund");
         _funds[msg.sender] = 0;
@@ -59,7 +59,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
         emit ReFunded(msg.sender, amount, block.timestamp);
     }
 
-    function setDistributeList(address[] calldata _distributeAddress, uint256[] calldata _distributeAmount) public onlyOwner {
+    function setDistributeList(address[] calldata _distributeAddress, uint256[] calldata _distributeAmount) public onlyOwner onlyActive{
         require(_distributeAddress.length == _distributeAmount.length, "distributeAddress length not equal distributeAmount length");
         uint256 total;
         for(uint256 i = 0; i < _distributeAddress.length; i++){
@@ -70,7 +70,7 @@ contract Funding is UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradea
         distributePercentages = _distributeAmount;
     }
 
-    function distribute() public onlyOwner nonReentrant{
+    function distribute() public onlyOwner nonReentrant onlyActive onlySuccess onlyNotDuringFunding{
         require(balance > 0, "has no balance");
         uint256 totalAmount = balance;
         for(uint256 i = 0; i < distributeReceivers.length; i++){

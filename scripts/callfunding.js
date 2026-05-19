@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 
 async function main() {
     // ===================== 只需要改这里 =====================
-    const CONTRACT_ADDRESS = "0x67d269191c92Caf3cD7723F116c85e6E9bf55933";
+    const CONTRACT_ADDRESS = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
     const SEND_ETH = "1"; // 打款 1 ETH
     const DISTRIBUTEARR = ["0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", "0x90F79bf6EB2c4f870365E785982E1f101E93b906"]
     const DISTRIBUTEAMOUNT = [50, 50]
