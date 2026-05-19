@@ -1,13 +1,17 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
+1. 去中心化筹款系统 + 链上数据索引服务
+Solidity
+* 筹款合约√
+* 目标金额、退款机制、管理员权限√
+* 安全：重入锁、权限控制、事件完整√
+Hardhat
+* 完整部署脚本√
+* 单元测试√
+* 本地节点 / 测试网部署 （本地节点√）
+Go 后端
+* 区块监听（Funded 事件）√
+* 数据入库 PostgreSQL√
+* Gin API：
+    * 按交易哈希查询√
+    * 按用户地址查询参与记录√
+    * 筹款统计接口√
+    * 排行榜接口√
